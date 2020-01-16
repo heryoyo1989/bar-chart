@@ -1,13 +1,13 @@
 export interface IBarOptions {
   height: number;
-  label: String;
+  label: string;
   value: number;
   color: [number, number, number, number];
 }
 
 export class Bar {
   height: number;
-  label: String;
+  label: string;
   value: number;
   color: [number, number, number, number];
 

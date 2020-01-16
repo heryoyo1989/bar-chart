@@ -1,7 +1,6 @@
 import React, { Component, ReactNode } from "react";
 import {
   BasicSurface,
-  CircleInstance,
   InstanceProvider,
   Camera2D,
   BasicCamera2DController,
@@ -14,11 +13,13 @@ import {
   AutoEasingLoopStyle,
   RectangleLayer,
   EdgeLayer,
-  EdgeType
+  EdgeType,
+  LabelLayer
 } from "deltav";
 import { BarChartAction } from "src/action";
 import { BarChartStore } from "src/store";
 import { observer } from "mobx-react";
+import { DEFAULT_RESOURCES } from "src/types";
 
 const { random } = Math;
 
@@ -49,14 +50,16 @@ export interface IBarCharViewProps {
       cameras: {
         main: new Camera2D()
       },
-      resources: {},
+      resources: {
+        font: DEFAULT_RESOURCES.font
+      },
       eventManagers: cameras => ({
         main: new BasicCamera2DController({
           camera: cameras.main,
           startView: ["main.main"]
         })
       }),
-      scenes: (_resources, providers, cameras) => ({
+      scenes: (resources, providers, cameras) => ({
         resources: [],
         scenes: {
           main: {
@@ -68,32 +71,19 @@ export interface IBarCharViewProps {
               })
             },
             layers: [
-              /*createLayer(CircleLayer, {
-                animate: {
-                  center: AutoEasingMethod.easeInOutCubic(
-                    2000,
-                    0,
-                    AutoEasingLoopStyle.NONE
-                  )
-                },
-                data: providers.circles,
-                key: `circles`,
-                scaleFactor: () => cameras.main.scale2D[0],
-                onMouseClick: () => {
-                  console.warn("mouse click");
-                  // this.action.addRandomData();
-                },
-                usePoints: true
-              })*/
-
               createLayer(EdgeLayer, {
                 data: providers.lines,
                 key: `lines`,
                 type: EdgeType.LINE
-              })
-              , createLayer(RectangleLayer, {
+              }), 
+              createLayer(RectangleLayer, {
                 data: providers.rectangles,
                 key: `recs`,
+              }),
+              createLayer(LabelLayer, {
+                data: providers.labels,
+                key: `labels`,
+                resourceKey: resources.font.key,
               })
             ]
           }
