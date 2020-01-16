@@ -1,1 +1,1 @@
-export * from "./bar-action";
+export * from "./bar-chart-action";

@@ -11,22 +11,25 @@ import {
   createLayer,
   CircleLayer,
   AutoEasingMethod,
-  AutoEasingLoopStyle
+  AutoEasingLoopStyle,
+  RectangleLayer,
+  EdgeLayer,
+  EdgeType
 } from "deltav";
-import { BarAction } from "src/action";
-import { BarStore } from "src/store";
+import { BarChartAction } from "src/action";
+import { BarChartStore } from "src/store";
 import { observer } from "mobx-react";
 
 const { random } = Math;
 
 export interface IBarCharViewProps {
-  action: BarAction;
-  store: BarStore;
+  action: BarChartAction;
+  store: BarChartStore;
 }
 
 @observer export class BarChartView extends Component<IBarCharViewProps> {
-  action: BarAction;
-  store: BarStore;
+  action: BarChartAction;
+  store: BarChartStore;
 
   constructor(props: IBarCharViewProps) {
     super(props);
@@ -65,7 +68,7 @@ export interface IBarCharViewProps {
               })
             },
             layers: [
-              createLayer(CircleLayer, {
+              /*createLayer(CircleLayer, {
                 animate: {
                   center: AutoEasingMethod.easeInOutCubic(
                     2000,
@@ -81,6 +84,16 @@ export interface IBarCharViewProps {
                   // this.action.addRandomData();
                 },
                 usePoints: true
+              })*/
+
+              createLayer(EdgeLayer, {
+                data: providers.lines,
+                key: `lines`,
+                type: EdgeType.LINE
+              })
+              , createLayer(RectangleLayer, {
+                data: providers.rectangles,
+                key: `recs`,
               })
             ]
           }

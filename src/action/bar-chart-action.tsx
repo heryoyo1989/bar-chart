@@ -1,14 +1,14 @@
-import { BarStore } from "../store";
+import { BarChartStore } from "../store";
 
-export class BarAction {
-  store: BarStore;
+export class BarChartAction {
+  store: BarChartStore;
 
   addRandomData() {
     const x = 300 * Math.random();
     const y = 500 * Math.random();
 
     if (this.store) {
-      this.store.addCircle(x, y);
+      // this.store.addCircle(x, y);
     }
 
 
