@@ -17,7 +17,10 @@ import {
   LabelLayer,
   IPickInfo,
   RectangleInstance,
-  PickType
+  PickType,
+  LabelInstance,
+  EdgeInstance,
+  SimpleEventHandler
 } from "deltav";
 import { BarChartAction } from "src/action";
 import { BarChartStore } from "src/store";
@@ -34,12 +37,25 @@ export interface IBarCharViewProps {
 @observer export class BarChartView extends Component<IBarCharViewProps> {
   action: BarChartAction;
   store: BarChartStore;
+  
+  testProvider = {
+    rectangles: new InstanceProvider<RectangleInstance>(),
+    labels: new InstanceProvider<LabelInstance>(),
+    lines: new InstanceProvider<EdgeInstance>()
+  }
 
   constructor(props: IBarCharViewProps) {
     super(props);
     this.action = props.action;
     this.store = props.store;
-    this.mouseOverHandler = this.mouseOverHandler.bind(this);
+    // this.mouseOverHandler = this.mouseOverHandler.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+
+    this.testProvider.rectangles.add(new RectangleInstance({
+      position: [0, 0],
+      color: [1, 1, 1, 1],
+      size: [100, 300],
+    }));
   }
 
   mouseOverHandler = (info: IPickInfo<RectangleInstance>) => {
@@ -49,14 +65,16 @@ export interface IBarCharViewProps {
     });
   }
 
+  handleClick() {
+    console.warn('handle click');
+  }
+
   makeSurface() {
     const element = document.createElement('div');
-    document.body.appendChild(element);
     element.style.width = '100%';
     element.style.height = '100%';
-    element.onclick = () => {
-      console.warn("element click");
-    }
+    const container = document.getElementById('main');
+    if(container) container.appendChild(element);
 
     const surface = new BasicSurface({
       container: element,
@@ -68,9 +86,12 @@ export interface IBarCharViewProps {
         font: DEFAULT_RESOURCES.font
       },
       eventManagers: cameras => ({
-        main: new BasicCamera2DController({
+        controller: new BasicCamera2DController({
           camera: cameras.main,
-          startView: ["main.main"]
+          startView: "main.main"
+        }),
+        simple: new SimpleEventHandler({
+
         })
       }),
       scenes: (resources, providers, cameras) => ({
@@ -84,6 +105,19 @@ export interface IBarCharViewProps {
               })
             },
             layers: [
+              createLayer(RectangleLayer, {
+                data: providers.rectangles,
+                key: `recs`,
+                picking: PickType.SINGLE,
+                onMouseOver:this.mouseOverHandler,
+                onMouseOut: (info: IPickInfo<RectangleInstance>) => {
+                  console.warn('Recs Mouse Out');
+                },
+                onMouseClick: (info: IPickInfo<RectangleInstance>) => {
+                  console.warn('Recs Mouse Click');
+                }
+
+              }),
               createLayer(EdgeLayer, {
                 data: providers.lines,
                 key: `lines`,
@@ -94,21 +128,7 @@ export interface IBarCharViewProps {
                 key: `labels`,
                 resourceKey: resources.font.key,
               }),
-              createLayer(RectangleLayer, {
-                data: providers.rectangles,
-                key: `recs`,
-                picking: PickType.SINGLE,
-                onMouseOver: () => {
-                  console.warn("over");
-                },
-                onMouseOut: (info: IPickInfo<RectangleInstance>) => {
-                  console.warn('Recs Mouse Out');
-                },
-                onMouseClick: (info: IPickInfo<RectangleInstance>) => {
-                  console.warn('Recs Mouse Click');
-                }
-
-              })
+              
             ]
           }
         }
@@ -119,8 +139,7 @@ export interface IBarCharViewProps {
   }
 
   render() {
-    return <div onClick={() => { console.warn("dive mouse over") }}>
-      {this.makeSurface()}
-    </div>;
+    this.makeSurface();
+    return false;
   }
 }
