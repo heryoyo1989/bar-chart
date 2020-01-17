@@ -16,6 +16,10 @@ export class BarChartStore {
   }
 
   constructor(options: IBarChartStoreOptions) {
+    this.init(options);
+  }
+
+  init(options: IBarChartStoreOptions) {
     const {
       barData,
       origin,

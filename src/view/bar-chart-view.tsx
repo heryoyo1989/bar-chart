@@ -14,7 +14,10 @@ import {
   RectangleLayer,
   EdgeLayer,
   EdgeType,
-  LabelLayer
+  LabelLayer,
+  IPickInfo,
+  RectangleInstance,
+  PickType
 } from "deltav";
 import { BarChartAction } from "src/action";
 import { BarChartStore } from "src/store";
@@ -36,6 +39,14 @@ export interface IBarCharViewProps {
     super(props);
     this.action = props.action;
     this.store = props.store;
+    this.mouseOverHandler = this.mouseOverHandler.bind(this);
+  }
+
+  mouseOverHandler = (info: IPickInfo<RectangleInstance>) => {
+    console.warn('Recs Mouse Over');
+    info.instances.forEach(instance => {
+      instance.color = [1, 1, 1, 1];
+    });
   }
 
   makeSurface() {
@@ -43,6 +54,9 @@ export interface IBarCharViewProps {
     document.body.appendChild(element);
     element.style.width = '100%';
     element.style.height = '100%';
+    element.onclick = () => {
+      console.warn("element click");
+    }
 
     const surface = new BasicSurface({
       container: element,
@@ -60,7 +74,6 @@ export interface IBarCharViewProps {
         })
       }),
       scenes: (resources, providers, cameras) => ({
-        resources: [],
         scenes: {
           main: {
             views: {
@@ -75,15 +88,26 @@ export interface IBarCharViewProps {
                 data: providers.lines,
                 key: `lines`,
                 type: EdgeType.LINE
-              }), 
-              createLayer(RectangleLayer, {
-                data: providers.rectangles,
-                key: `recs`,
               }),
               createLayer(LabelLayer, {
                 data: providers.labels,
                 key: `labels`,
                 resourceKey: resources.font.key,
+              }),
+              createLayer(RectangleLayer, {
+                data: providers.rectangles,
+                key: `recs`,
+                picking: PickType.SINGLE,
+                onMouseOver: () => {
+                  console.warn("over");
+                },
+                onMouseOut: (info: IPickInfo<RectangleInstance>) => {
+                  console.warn('Recs Mouse Out');
+                },
+                onMouseClick: (info: IPickInfo<RectangleInstance>) => {
+                  console.warn('Recs Mouse Click');
+                }
+
               })
             ]
           }
@@ -91,12 +115,11 @@ export interface IBarCharViewProps {
       })
     });
 
-    return false;
+    return <div></div>;
   }
 
   render() {
-    return <div>
-      <button onClick={() => this.action.addRandomData()}>Add</button>
+    return <div onClick={() => { console.warn("dive mouse over") }}>
       {this.makeSurface()}
     </div>;
   }
